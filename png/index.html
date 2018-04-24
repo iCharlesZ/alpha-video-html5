@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="initial-scale=1.0"/>
+	<script type="text/javascript" src="../src/jquery-3.2.1.js"></script>
+	<title>序列帧实现alpha通道视频</title>
+	<style type="text/css">
+		*{ 
+			margin: 0;
+			padding: 0;
+		}
+
+		#img, img {
+			width: 100%;
+		}
+	</style>
+</head>
+<body>
+
+<div id="img">
+	<img src="./img/Comp 1_00000.png">
+</div>
+
+		
+<script>
+$(function(){
+    var i = 0;
+    var timer = setInterval(function(){
+        i++;
+        i = parseInt(i);
+        if (i < 10){
+            $("#img img").attr("src","./img/Comp 1_0000"+i+".png");
+        } else if(i < 100){
+            $("#img img").attr("src","./img/Comp 1_000"+i+".png");
+        } else if(i < 234){    
+            $("#img img").attr("src","./img/Comp 1_00"+i+".png");
+        } else if(i == 234){
+            $("#img img").attr("src","./img/Comp 1_00234.png");
+            clearInterval(timer)
+        }   
+    }, 1000 / 24);
+})
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<title>canvas实现alpha通道视频</title>
+	<script type="text/javascript" src="../src/jquery-3.2.1.js"></script>
+	<script type="text/javascript" src="../src/vconsole.min.js"></script>
+	<style type="text/css">
+		 * {
+		 	margin: 0;
+		 	padding: 0;
+		 }
+
+		 body {
+		 	background-color: green;
+		 }
+
+		 video, #output, #show, #buffer {
+		 	width: 100%;
+		 }
+
+		 #loading {
+		 	width: 100px;
+		 	height: 50px;
+		 	position: absolute;
+		 	z-index: 100;
+		 	left: 50%;
+		 	top: 50%;
+		 	margin-left: -50px;
+		 	margin-top: -25px;
+		 	background-color: rgba(0, 0, 0, 0.1);
+		 	border-radius: 10px;
+		 	text-align: center;
+		 	color: grey;
+		 	line-height: 50px;
+		 	font-size: 12px;
+		 }
+	</style>
+</head>
+<body>
+	<div id="loading">视频加载中...</div>
+	<div id="mask"></div>
+
+	<video id="alpha-video" style="display: none;" playsinline>
+		<source src="./video/video.mp4" type="video/mp4">
+	</video>
+
+	<div id="output">
+		<canvas id="show" width="375" height="667"></canvas>
+		<canvas id="buffer" width="375" height="1334" style="display: none;"></canvas>
+	</div>
+	
+<script type="text/javascript">
+	$(function () {
+		window.vConsole = new window.VConsole({
+		    defaultPlugins: ['system', 'network'],
+		    maxLogNumber: 1000
+		});
+
+
+		var showCanvas = document.getElementById("show");
+		var showCtx = showCanvas.getContext("2d");
+		var bufferCanvas = document.getElementById("buffer");
+		var bufferCtx = bufferCanvas.getContext("2d");
+		var video = document.getElementById('alpha-video');
+		var width = showCanvas.width;
+		var height = showCanvas.height;
+		var image;
+		var alphaData;
+
+		video.play();
+
+		function processFrame () {
+			bufferCtx.drawImage(video, 0, 0, width, height * 2);
+			image = bufferCtx.getImageData(0, 0, width, height),
+	        alphaData = bufferCtx.getImageData(0, height, width, height).data;
+
+	        for (var i = 3, len = image.data.length; i < len; i = i + 4) {
+				image.data[i] = alphaData[i - 1]; 
+			}
+			showCtx.putImageData(image, 0, 0, 0, 0, width, height);
+	        requestAnimationFrame(processFrame);
+		}
+
+
+		video.addEventListener('play', function() {
+			$('#loading').hide();
+	        processFrame();
+	    }, false);
+
+	    video.addEventListener('ended', function() {
+	    	console.log('播放完毕跳转');
+	    }, false);
+	})
+</script>
+</body>
+</html>
